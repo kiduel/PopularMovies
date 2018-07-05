@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">popular-movie</string>
+    <string name="request_url">http://api.themoviedb.org/3/movie/popular?api_key=2300212519d886d20b216d33f77452ee</string>
+</resources>

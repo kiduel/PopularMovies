@@ -175,21 +175,4 @@ public class JsonUtils {
         return output.toString();
     }
 
-    public static Movie parseAMovieFromJson (String json) throws JSONException {
-        //Here is where we are going to parse the details from the Json.
-        //Here is the basics of the parsing,
-        //This returns the movie, that is parsed
-
-        JSONObject reader = new JSONObject(json);                   //getting a JSON reader object
-        JSONArray json_movie_names = reader.getJSONArray(KEY_RESULTS); //Name is has two childeren, main name and also Known As
-        JSONObject jsonObject = json_movie_names.getJSONObject(0); //This cannot be 0, this will only check the first element of the array
-        String title = jsonObject.getString(KEY_TITLE);
-        String overview = jsonObject.getString(KEY_OVERVIEW);
-        String release_date = jsonObject.getString(KEY_RELEASE_DATE);
-        String rating = jsonObject.getString(KEY_RATING);
-        double rating_double = Double.parseDouble(rating);
-
-        Movie movie = new Movie(title, null, overview, release_date, rating_double);
-        return movie;
-    }
 }
