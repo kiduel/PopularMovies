@@ -8,9 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.android.popular_movie.DetailActivity;
 import com.example.android.popular_movie.R;
+import com.example.android.popular_movie.data.MovieContract;
 import com.example.android.popular_movie.model.Movie;
 import com.squareup.picasso.Picasso;
 
@@ -20,7 +22,6 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
 
     private final ArrayList<Movie> movies;
     private Context context;
-    private String title, description;
 
     public GridAdapter(Context context, ArrayList<Movie> movies) {
         this.movies = movies;
@@ -30,24 +31,31 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private View parentView;
         private ImageView poster_cover;
+        private TextView movie_title;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
             this.parentView = itemView;
             poster_cover = itemView.findViewById(R.id.image_poster);
+            movie_title = itemView.findViewById(R.id.movie_title_cardview);
 
             this.parentView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
+
             Intent intent = new Intent(context, DetailActivity.class);
             Movie movie = movies.get(getAdapterPosition());
             intent.putExtra(DetailActivity.TITLE, movie.getOriginal_title());
             intent.putExtra(DetailActivity.DESCRIPTION, movie.getOverview());
             intent.putExtra(DetailActivity.RELEASE_DATE, movie.getRelease_date());
             intent.putExtra(DetailActivity.POSTER, movie.getPoster_path());
+            intent.putExtra(DetailActivity.RATE, movie.getVote_average());
+            intent.putExtra(DetailActivity.MOVIE_ID, movie.getMovie_id());
+            intent.putExtra(MovieContract.MovieEntry._ID, movie.getMovie_id());
+
             context.startActivity(intent);
         }
     }
@@ -66,14 +74,24 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
         return new GridAdapter.ViewHolder(poster);
     }
 
+    public static String preparePoster() {
+        String base_url = "http://image.tmdb.org/t/p/";
+        String size = "w185/";
+        return base_url + size;
+    }
     @Override
     public void onBindViewHolder(@NonNull GridAdapter.ViewHolder holder, int position) {
+
         Movie movie = movies.get(position);
         Picasso
                 .get()
-                .load(movie.getPoster_path())
-                .placeholder(R.drawable.box) // placeholder
+                .load(preparePoster() + movie.getPoster_path())
+                .placeholder(R.drawable.download) // placeholder
+                .error(R.drawable.error) //  error
                 .into(holder.poster_cover);
+        holder.movie_title.setText(movie.getOriginal_title());
+
+
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.example.android.popular_movie.utils;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.example.android.popular_movie.model.Movie;
 
@@ -19,6 +18,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+import timber.log.Timber;
+
 public class JsonUtils {
     private static final String TAG = "JSON_TAG" ;
     private static final String KEY_RESULTS = "results";
@@ -26,12 +27,15 @@ public class JsonUtils {
     private static final String KEY_OVERVIEW = "overview";
     private static final String KEY_RELEASE_DATE = "release_date";
     private static final String KEY_RATING = "vote_average";
+    private static final String KEY_POSTER = "poster_path";
+    private static final String MOVIE_ID = "id";
+
 
 
 
     //the fetch do all the work and return ArrayList of News
     public static ArrayList<Movie> fetchTheMovies(String requestURL) {
-        Log.i("Test", "fetchTheMovies: fetch is running ");
+        Timber.i("fetchTheMovies: fetch is running ");
         //Create url object from the string
         URL url = createURL(requestURL);
 
@@ -41,19 +45,18 @@ public class JsonUtils {
         try {
             jsonResponse = makeHttpRequest(url);
         } catch (IOException e) {
-            Log.e(TAG, "Error closing input stream", e);
+            Timber.i("Error closing input stream");
         }
 
-
-        // we pass the long String and then will get the extracted JSONArray list.
+      // we pass the long String and then will get the extracted JSONArray list.
         return extractFeatureFromJson(jsonResponse);
     }
 
 
     private static ArrayList<Movie> extractFeatureFromJson(String moviesJSON) {
-        Log.i("test", "extractFeatureFromJson: extract has begun");
+        Timber.i("extractFeatureFromJson: extract has begun");
         if (TextUtils.isEmpty(moviesJSON)) {
-            Log.i("Movies", "is Empty");
+            Timber.i("is Empty");
             return null;
         }
 
@@ -68,11 +71,17 @@ public class JsonUtils {
                 String overview = jsonObject.getString(KEY_OVERVIEW);
                 String release_date = jsonObject.getString(KEY_RELEASE_DATE);
                 String rating = jsonObject.getString(KEY_RATING);
+                String poster = jsonObject.getString(KEY_POSTER);
+                String movie_id = jsonObject.getString(MOVIE_ID);
+
+
                 double rating_double = Double.parseDouble(rating);
+                int movie_id_int = Integer.parseInt(movie_id);
+
 
                 // Create a new {@link Movie} object with the title, overview, release_date and the rating
                 // and url from the JSON response.
-                Movie movies = new Movie(title, null,  overview, release_date, rating_double);
+                Movie movies = new Movie(title, poster,  overview, release_date, rating_double, movie_id_int);
 
                 // Add the new {@link Earthquake} to the list of earthquakes.
                 movieArrayList.add(movies);
@@ -89,12 +98,12 @@ public class JsonUtils {
     This method will create a url from the string we pass to it.
      */
     private static URL createURL (String requestURL) {
-        Log.i("Test", "URL: url has been created ");
+        Timber.i("URL: url has been created ");
         URL url = null;
         try {
             url = new URL(requestURL);
         } catch (MalformedURLException e) {
-            Log.e("Error", "Error with creating URL ", e);
+            Timber.e(e, "Error with creating URL ");
         }
         return url;
     }
@@ -126,7 +135,7 @@ public class JsonUtils {
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
             int code = urlConnection.getResponseCode();
-            Log.i(TAG, "makeHttpRequest: " + code);
+            Timber.i("makeHttpRequest: " + code);
 
             /**
              * If the request was successful (response code 200)
@@ -136,11 +145,11 @@ public class JsonUtils {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
             } else {
-                Log.e("Error", "Error in response code");
+                Timber.e("Error in response code");
 
             }
         } catch (IOException e) {
-            Log.e("Error", "Problem downloading the book", e);
+            Timber.e(e, "Problem downloading the movies");
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect(); //disconnect when done
@@ -148,7 +157,7 @@ public class JsonUtils {
             if (inputStream != null) {
                 inputStream.close();   //close
             }
-            Log.i("test", "makeHttpRequest: jsonResponse has been made " + urlConnection.getResponseCode());
+            Timber.i("makeHttpRequest: jsonResponse has been made " + urlConnection.getResponseCode());
             return jsonResponse;
         }
     }
@@ -171,7 +180,7 @@ public class JsonUtils {
                 line = reader.readLine();
             }
         }
-        Log.i("Test", "readFromStream: the stream has been converted");
+        Timber.i("readFromStream: the stream has been converted");
         return output.toString();
     }
 

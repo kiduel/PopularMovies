@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
+    <TextView
+        android:id="@+id/movie_error"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textAllCaps="true"
+        android:foregroundGravity="center"
+        android:textStyle="bold"
+        android:text="@string/problem"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_movies"
         android:layout_width="match_parent"
@@ -13,4 +25,6 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
       />
+
+
 </RelativeLayout>
