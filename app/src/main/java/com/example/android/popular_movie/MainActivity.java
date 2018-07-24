@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popular_movie.adapters.GridAdapter;
 import com.example.android.popular_movie.data.MovieContract.MovieEntry;
@@ -170,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
             return true;
         }
         if (id == R.id.fav) {
+            Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
             //  Create arraylist and add movies with liked == 1 to it
             //  Display the movies.
         }
