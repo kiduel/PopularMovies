@@ -3,6 +3,7 @@ package com.example.android.popular_movie.utils;
 import android.text.TextUtils;
 
 import com.example.android.popular_movie.model.Movie;
+import com.example.android.popular_movie.model.MovieReview;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,10 +31,13 @@ public class JsonUtils {
     private static final String KEY_POSTER = "poster_path";
     private static final String MOVIE_ID = "id";
 
+    private static final String KEY_REVIEWER = "author";
+    private static final String KEY_REVIEW = "content";
+    private static final String KEY_REVIEW_ID = "id";
 
 
 
-    //the fetch do all the work and return ArrayList of News
+    //the fetch do all the work and return ArrayList of Movies
     public static ArrayList<Movie> fetchTheMovies(String requestURL) {
         Timber.i("fetchTheMovies: fetch is running ");
         //Create url object from the string
@@ -183,5 +187,69 @@ public class JsonUtils {
         Timber.i("readFromStream: the stream has been converted");
         return output.toString();
     }
+
+/*
+The following code is going to used to parse and return the movie reviews
+ */
+
+
+
+    //the fetch do all the work and return ArrayList of movieReviews
+    public static ArrayList<MovieReview> fetchTheMovieReviews(String requestURL) {
+        Timber.i("fetchTheMovieReviews: fetch is running ");
+        //Create url object from the string
+        URL url = createURL(requestURL);
+
+        //jsonResponse is the Json response from the string
+        //the long json string is the jsonString
+        String jsonResponseforreview = null;
+        try {
+            jsonResponseforreview = makeHttpRequest(url);
+        } catch (IOException e) {
+            Timber.i("Error closing input stream");
+        }
+
+        // we pass the long String and then will get the extracted JSONArray list.
+        return extractFeatureFromJsonReview(jsonResponseforreview);
+    }
+
+    private static ArrayList<MovieReview> extractFeatureFromJsonReview(String moviesReviewJSON) {
+        Timber.i("extractFeatureFromJson: extract has begun");
+        if (TextUtils.isEmpty(moviesReviewJSON)) {
+            Timber.i("is Empty");
+            return null;
+        }
+
+        ArrayList<MovieReview> movieReviewArrayList = new ArrayList<>();
+        try {
+            JSONObject reader = new JSONObject(moviesReviewJSON);                   //getting a JSON reader object
+            JSONArray json_movie_reviews = reader.getJSONArray(KEY_RESULTS);
+
+            for (int i = 0; i < json_movie_reviews.length(); i ++) {
+                JSONObject jsonObject = json_movie_reviews.getJSONObject(i); //This cannot be 0, this will only check the first element of the array
+                String reviewer = jsonObject.getString(KEY_REVIEWER);
+                String review = jsonObject.getString(KEY_REVIEW);
+                String id = jsonObject.getString(KEY_REVIEW_ID);
+
+
+                // Create a new {@link Movie} object with the title, overview, release_date and the rating
+                // and url from the JSON response.
+                MovieReview movieReview = new MovieReview(id, reviewer, review);
+
+                // Add the new {@link Earthquake} to the list of earthquakes.
+                movieReviewArrayList.add(movieReview);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return movieReviewArrayList;
+    }
+
+
+
+
+
+
 
 }

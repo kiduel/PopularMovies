@@ -1,21 +1,26 @@
 package com.example.android.popular_movie;
 
-import android.content.ContentValues;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.popular_movie.adapters.GridAdapter;
-import com.example.android.popular_movie.data.MovieContract.MovieEntry;
+import com.example.android.popular_movie.data.MovieContract;
+import com.example.android.popular_movie.data.MovieCursorAdapter;
 import com.example.android.popular_movie.model.Movie;
 import com.example.android.popular_movie.utils.FetchMovies;
 import com.example.android.popular_movie.utils.OnTaskCompleted;
@@ -28,14 +33,20 @@ import butterknife.ButterKnife;
 import timber.log.Timber;
 
 
-public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
+public class MainActivity extends AppCompatActivity implements OnTaskCompleted,
+        android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
+
     private static final String TAG = "Main_Activity";
     GridAdapter gridAdapter;
     Boolean isConnected;
     ArrayList <Movie> movies_list = new ArrayList<>();
+    private MovieCursorAdapter mAdapter; //for displaying fav movies
+    private static final int MOVIE_LOADER_ID = 0;
+
 
     public static int NOT_LIKED = 0;
     public static int LIKED = 1;
+    public static int mNoOfColumns;
 
     /*
     We want to import the lists to an SQLDataBase only once,
@@ -61,7 +72,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
-        int mNoOfColumns = Utility.calculateNoOfColumns(getApplicationContext());
+        mNoOfColumns = Utility.calculateNoOfColumns(getApplicationContext());
+
+
+        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+        mAdapter = new MovieCursorAdapter(this);
+
 
         //If internet is available
         if (isConnected) {
@@ -71,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
             grid_manager = new GridLayoutManager(this, mNoOfColumns);
             rv_grid_movies.setLayoutManager(grid_manager);
 
-            FetchMovies task = new FetchMovies(MainActivity.this, prepareStringPopular());
+            FetchMovies task = new FetchMovies(MainActivity.this, Utility.prepareStringPopular());
             task.execute();
 
         } else {
@@ -81,65 +97,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
     }
 
-    /*
-    Prepare the url String for Popular movies
-     */
-    private static String prepareStringPopular() {
-        String base_url = "https://api.themoviedb.org/3/movie/popular?api_key=";
-        return base_url + Utility.API_KEY;
-    }
-
-    /*
-    @param = This function will add movies to our sqlDatabse
-     */
-    public void addMoviesToDatabase (ArrayList<Movie> movies){
-        //I want to add the movies to an SQL table
-        for (int x = 0; x < movies.size(); x++) {
-            Movie movie = movies.get(x);
-
-
-
-        // Create new empty ContentValues object
-        ContentValues contentValues = new ContentValues();
-        // Put the task description and selected mPriority into the ContentValues
-            contentValues.put(MovieEntry.COLUMN_MOVIE_ID, movie.getMovie_id());
-            contentValues.put(MovieEntry.COLUMN_TITLE, movie.getOriginal_title());
-            contentValues.put(MovieEntry.COLUMN_POSTER_PATH, movie.getPoster_path());
-            contentValues.put(MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
-            contentValues.put(MovieEntry.COLUMN_RELEASE_DATE, movie.getRelease_date());
-            contentValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, String.valueOf(movie.getVote_average()));
-            contentValues.put(MovieEntry.COLUMN_LIKED, NOT_LIKED);
-
-
-            // Insert the content values via a ContentResolver
-            getContentResolver().insert(MovieEntry.CONTENT_URI, contentValues);
-        }
-    }
-    /*
-   Prepare the url String for Popular movies
-    */
-    private static String prepareStringTopRated() {
-        String base_url = "https://api.themoviedb.org/3/movie/top_rated?api_key=";
-        return base_url + Utility.API_KEY;
-    }
 
     @Override
     public void onTaskCompleted(ArrayList<Movie> movies) {
         gridAdapter = new GridAdapter(getBaseContext(), movies);
         rv_grid_movies.setAdapter(gridAdapter);
         movies_list = movies;
-
-          /*
-    We want to import the lists to an SQLDataBase only once,
-    This integers will serve for conditional statement.
-     */
-        if (import_for_top_rated == 0 || import_for_popular == 0){
-            addMoviesToDatabase(movies_list);
-            import_for_popular ++;
-        }
     }
-
-
+    
     /*
     Create a the menu
      */
@@ -150,32 +115,107 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+
+
+    }
+
     /*
-    Execute action when the menu item is clicked
-     */
+        Execute action when the menu item is clicked
+         */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.sort) {
             import_for_top_rated --;
-            FetchMovies task = new FetchMovies(MainActivity.this, prepareStringTopRated());
+            FetchMovies task = new FetchMovies(MainActivity.this, Utility.prepareStringTopRated());
             task.execute();
             return true;
         }
 
         if ( id == R.id.popularity ){
             import_for_popular ++;
-            FetchMovies task = new FetchMovies(MainActivity.this, prepareStringPopular());
+            FetchMovies task = new FetchMovies(MainActivity.this, Utility.prepareStringPopular());
             task.execute();
             return true;
         }
         if (id == R.id.fav) {
-            Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
-            //  Create arraylist and add movies with liked == 1 to it
-            //  Display the movies.
+
+
+            rv_grid_movies.setAdapter(mAdapter);
+
+            GridLayoutManager grid_manager;
+            grid_manager = new GridLayoutManager(this, mNoOfColumns);
+            rv_grid_movies.setLayoutManager(grid_manager);
+
         }
         return super.onOptionsItemSelected(item);
     }
-}
 
+    @SuppressLint("StaticFieldLeak")
+    @Override
+    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, final Bundle loaderArgs) {
+
+        return new AsyncTaskLoader<Cursor>(this) {
+
+            // Initialize a Cursor, this will hold all the task data
+            Cursor mMovieData = null;
+
+            // onStartLoading() is called when a loader first starts loading data
+            @Override
+            protected void onStartLoading() {
+                if (mMovieData != null) {
+                    // Delivers any previously loaded data immediately
+                    deliverResult(mMovieData);
+                } else {
+                    // Force a new load
+                    forceLoad();
+                }
+            }
+
+            @Nullable
+            @Override
+            public Cursor loadInBackground() {
+                // Will implement to load data
+
+                // COMPLETED (5) Query and load all task data in the background; sort by priority
+                // [Hint] use a try/catch block to catch any errors in loading data
+
+                try {
+                    return getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                          null);
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to asynchronously load data.");
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            // deliverResult sends the result of the load, a Cursor, to the registered listener
+            public void deliverResult(Cursor data) {
+                mMovieData = data;
+                super.deliverResult(data);
+            }
+        };
+
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull android.support.v4.content.Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
+
+}

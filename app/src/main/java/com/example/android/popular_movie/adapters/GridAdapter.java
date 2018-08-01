@@ -14,6 +14,7 @@ import com.example.android.popular_movie.DetailActivity;
 import com.example.android.popular_movie.R;
 import com.example.android.popular_movie.data.MovieContract;
 import com.example.android.popular_movie.model.Movie;
+import com.example.android.popular_movie.utils.Utility;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
 
             Intent intent = new Intent(context, DetailActivity.class);
             Movie movie = movies.get(getAdapterPosition());
+
             intent.putExtra(DetailActivity.TITLE, movie.getOriginal_title());
             intent.putExtra(DetailActivity.DESCRIPTION, movie.getOverview());
             intent.putExtra(DetailActivity.RELEASE_DATE, movie.getRelease_date());
@@ -74,18 +76,13 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
         return new GridAdapter.ViewHolder(poster);
     }
 
-    public static String preparePoster() {
-        String base_url = "http://image.tmdb.org/t/p/";
-        String size = "w185/";
-        return base_url + size;
-    }
     @Override
     public void onBindViewHolder(@NonNull GridAdapter.ViewHolder holder, int position) {
 
         Movie movie = movies.get(position);
         Picasso
                 .get()
-                .load(preparePoster() + movie.getPoster_path())
+                .load(Utility.preparePoster() + movie.getPoster_path())
                 .placeholder(R.drawable.download) // placeholder
                 .error(R.drawable.error) //  error
                 .into(holder.poster_cover);

@@ -16,4 +16,32 @@ public class Utility {
         int noOfColumns = (int) (dpWidth / 180);
         return noOfColumns;
     }
+    public static String preparePoster() {
+        String base_url = "http://image.tmdb.org/t/p/";
+        String size = "w185/";
+        return base_url + size;
+    }
+
+    /*
+    Prepare the url String for Popular movies
+     */
+    public static String prepareStringPopular() {
+        String base_url = "https://api.themoviedb.org/3/movie/popular?api_key=";
+        return base_url + Utility.API_KEY;
+    }
+
+    public static String prepareStringTopRated() {
+        String base_url = "https://api.themoviedb.org/3/movie/top_rated?api_key=";
+        return base_url + Utility.API_KEY;
+    }
+
+    /*
+   Prepare the url String for Popular movies
+    */
+    public static String prepareStringMovieReviews(int id) {
+        String base_url = "http://api.themoviedb.org/3/movie/";
+        String url_with_id = base_url + id;
+        String base_url_second = "/reviews?api_key=";
+        return url_with_id + base_url_second + Utility.API_KEY;
+    }
 }

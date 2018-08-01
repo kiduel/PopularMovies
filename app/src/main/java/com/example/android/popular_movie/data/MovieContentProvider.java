@@ -67,8 +67,36 @@ public class MovieContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
-        return null;
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        // selection and selections - "_id=?" , a number, example 3 is the answer
+        // projection is the name of the columns that needs to be returned
+        // Get readable database
+        SQLiteDatabase database = mMovieDbHelper.getReadableDatabase();
+
+        // This cursor will hold the result of the query
+        Cursor retCursor;
+
+        // Figure out if the URI matcher can match the URI to a specific code
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case MOVIES:
+                retCursor = database.query(MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                         null,
+                        sortOrder);
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+        }
+        //set the notification Uri on the cursor.
+        //so we know what content URI the Cursor was created for
+        //if the data at this URI changes, we know when we will need to update the Cursor.
+        retCursor.setNotificationUri(getContext().getContentResolver(),uri);
+
+        return retCursor;
     }
 
     @Nullable
@@ -114,8 +142,11 @@ public class MovieContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        //Open the database
+        SQLiteDatabase database = mMovieDbHelper.getWritableDatabase();
+
+        return database.delete(MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
     }
 
     @Override

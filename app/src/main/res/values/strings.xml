@@ -11,4 +11,7 @@
     <string name="like">Like</string>
     <string name="dislike">Dislike</string>
     <string name="favorite">Favorite</string>
+    <string name="movie_title_place_holder">Movie title</string>
+    <string name="reviewer">Reviewer</string>
+    <string name="sample_review">This is a sample review of a movie, it will have more than one line.</string>
 </resources>
