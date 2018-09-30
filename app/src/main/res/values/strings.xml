@@ -6,7 +6,7 @@
     <string name="overview">This is the description of the movie, it could have more than one line.</string>
     <string name="year">1999</string>
     <string name="sort">Sort by rating</string>
-    <string name="problem">opps! Problem loading movies, please try again later.</string>
+    <string name="problem">opps! connection problem, please try again when you have connection. But you can still browse through your favorite list. </string>
     <string name="sory_by_popularity">Sory by popularity</string>
     <string name="like">Like</string>
     <string name="dislike">Dislike</string>
@@ -14,4 +14,9 @@
     <string name="movie_title_place_holder">Movie title</string>
     <string name="reviewer">Reviewer</string>
     <string name="sample_review">This is a sample review of a movie, it will have more than one line.</string>
+    <string name="trailer_name">This is sample name of trailer</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+    <string name="no_connection_trailers">Connection is required to see trailers</string>
+    <string name="no_connection_review">connection is required to see reviews</string>
 </resources>

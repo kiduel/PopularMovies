@@ -13,22 +13,18 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/reviewer_tv"
+        <ImageView
+            android:id="@+id/trailer_poster"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:text="@string/reviewer"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:textSize="16sp"/>
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"/>
 
         <TextView
-            android:id="@+id/review_tv"
+            android:id="@+id/trailer_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="10dp"
-            android:text="@string/sample_review"
+            android:text="@string/trailer_name"
             android:layout_gravity="center_horizontal"
             android:textSize="20sp"/>
 

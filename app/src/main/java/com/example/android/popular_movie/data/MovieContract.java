@@ -46,6 +46,5 @@ public class MovieContract {
         //To keep track of if the movie is fav or not
         public static final String COLUMN_LIKED = "liked";
 
-
     }
 }

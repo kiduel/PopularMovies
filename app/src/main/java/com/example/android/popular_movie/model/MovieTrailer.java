@@ -1,15 +1,16 @@
 package com.example.android.popular_movie.model;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MovieTrailer {
     private String id;
     private String trailerKey;
+    private String name;
 
-    public MovieTrailer(JSONObject trailer) throws JSONException {
-        this.id = trailer.getString("id");
-        this.trailerKey = trailer.getString("key");
+    public MovieTrailer(String id, String key, String name) throws JSONException {
+        this.id = id;
+        this.trailerKey = key;
+        this.name = name;
     }
 
 
@@ -20,5 +21,9 @@ public class MovieTrailer {
 
     public String getKey(){
         return trailerKey;
+    }
+
+    public String getName() {
+        return name;
     }
 }

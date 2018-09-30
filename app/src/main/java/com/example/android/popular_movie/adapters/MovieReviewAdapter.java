@@ -51,7 +51,6 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private View parentView;
         private TextView reviewer;
         private TextView review;
 
@@ -59,7 +58,6 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.
             super(itemView);
             reviewer = itemView.findViewById(R.id.reviewer_tv);
             review = itemView.findViewById(R.id.review_tv);
-
         }
     }
 }

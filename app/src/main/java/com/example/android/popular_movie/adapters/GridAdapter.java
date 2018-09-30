@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popular_movie.DetailActivity;
 import com.example.android.popular_movie.R;
@@ -47,18 +48,22 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
         @Override
         public void onClick(View view) {
 
-            Intent intent = new Intent(context, DetailActivity.class);
-            Movie movie = movies.get(getAdapterPosition());
+            if (Utility.isConnected(context)) {
+                Intent intent = new Intent(context, DetailActivity.class);
+                Movie movie = movies.get(getAdapterPosition());
 
-            intent.putExtra(DetailActivity.TITLE, movie.getOriginal_title());
-            intent.putExtra(DetailActivity.DESCRIPTION, movie.getOverview());
-            intent.putExtra(DetailActivity.RELEASE_DATE, movie.getRelease_date());
-            intent.putExtra(DetailActivity.POSTER, movie.getPoster_path());
-            intent.putExtra(DetailActivity.RATE, movie.getVote_average());
-            intent.putExtra(DetailActivity.MOVIE_ID, movie.getMovie_id());
-            intent.putExtra(MovieContract.MovieEntry._ID, movie.getMovie_id());
+                intent.putExtra(DetailActivity.TITLE, movie.getOriginal_title());
+                intent.putExtra(DetailActivity.DESCRIPTION, movie.getOverview());
+                intent.putExtra(DetailActivity.RELEASE_DATE, movie.getRelease_date());
+                intent.putExtra(DetailActivity.POSTER, movie.getPoster_path());
+                intent.putExtra(DetailActivity.RATE, movie.getVote_average());
+                intent.putExtra(DetailActivity.MOVIE_ID, movie.getMovie_id());
+                intent.putExtra(MovieContract.MovieEntry._ID, movie.getMovie_id());
 
-            context.startActivity(intent);
+                context.startActivity(intent);
+            } else {
+                Toast.makeText(context, "There is no internet connection", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

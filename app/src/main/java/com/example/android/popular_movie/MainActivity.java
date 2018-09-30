@@ -1,10 +1,7 @@
 package com.example.android.popular_movie;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -43,17 +40,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted,
     private MovieCursorAdapter mAdapter; //for displaying fav movies
     private static final int MOVIE_LOADER_ID = 0;
 
-
-    public static int NOT_LIKED = 0;
-    public static int LIKED = 1;
     public static int mNoOfColumns;
 
     /*
     We want to import the lists to an SQLDataBase only once,
     This integers will serve for conditional statement.
      */
-    public int import_for_popular = 0;
-    public int import_for_top_rated = 1;
+
 
     @BindView(R.id.rv_movies) RecyclerView rv_grid_movies;
     @BindView(R.id.movie_error)
@@ -66,21 +59,16 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted,
 
         Timber.plant(new Timber.DebugTree());
         GridLayoutManager grid_manager;
-        //To check the connection, we created isConnected
-        ConnectivityManager cm =
-                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
+
         mNoOfColumns = Utility.calculateNoOfColumns(getApplicationContext());
 
 
+        if (Utility.isConnected(this)){
         getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
-        mAdapter = new MovieCursorAdapter(this);
-
+        mAdapter = new MovieCursorAdapter(this);}
 
         //If internet is available
-        if (isConnected) {
+        if (Utility.isConnected(this) ) {
             movie_error.setVisibility(View.GONE);
             // We initialize the loader
             // use a grid layout manager to display the movies
@@ -98,11 +86,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted,
     }
 
 
+
     @Override
     public void onTaskCompleted(ArrayList<Movie> movies) {
-        gridAdapter = new GridAdapter(getBaseContext(), movies);
-        rv_grid_movies.setAdapter(gridAdapter);
-        movies_list = movies;
+        if (Utility.isConnected(this)) {
+            gridAdapter = new GridAdapter(getBaseContext(), movies);
+            rv_grid_movies.setAdapter(gridAdapter);
+            movies_list = movies;
+        }
     }
     
     /*
@@ -118,10 +109,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted,
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
-
-
+        if (Utility.isConnected(this)) {
+            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+        }  else {rv_grid_movies.setVisibility(View.GONE);
+           movie_error.setVisibility(View.VISIBLE);}
     }
+
 
     /*
         Execute action when the menu item is clicked
@@ -131,27 +124,33 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted,
         int id = item.getItemId();
 
         if (id == R.id.sort) {
-            import_for_top_rated --;
-            FetchMovies task = new FetchMovies(MainActivity.this, Utility.prepareStringTopRated());
-            task.execute();
-            return true;
+            if (Utility.isConnected(this)) {
+                FetchMovies task = new FetchMovies(MainActivity.this, Utility.prepareStringTopRated());
+                task.execute();
+                return true;
+            }
+            else {rv_grid_movies.setVisibility(View.GONE);
+                movie_error.setVisibility(View.VISIBLE);}
+
         }
 
         if ( id == R.id.popularity ){
-            import_for_popular ++;
-            FetchMovies task = new FetchMovies(MainActivity.this, Utility.prepareStringPopular());
-            task.execute();
-            return true;
+            if (Utility.isConnected(this)) {
+                FetchMovies task = new FetchMovies(MainActivity.this, Utility.prepareStringPopular());
+                task.execute();
+                return true;
+            }
+            else {rv_grid_movies.setVisibility(View.GONE);
+                movie_error.setVisibility(View.VISIBLE);}
+
         }
         if (id == R.id.fav) {
-
-
-            rv_grid_movies.setAdapter(mAdapter);
-
-            GridLayoutManager grid_manager;
-            grid_manager = new GridLayoutManager(this, mNoOfColumns);
-            rv_grid_movies.setLayoutManager(grid_manager);
-
+                movie_error.setVisibility(View.GONE);
+                rv_grid_movies.setVisibility(View.VISIBLE);
+                rv_grid_movies.setAdapter(mAdapter);
+                GridLayoutManager grid_manager;
+                grid_manager = new GridLayoutManager(this, mNoOfColumns);
+                rv_grid_movies.setLayoutManager(grid_manager);
         }
         return super.onOptionsItemSelected(item);
     }

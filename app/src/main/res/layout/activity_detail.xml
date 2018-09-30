@@ -157,17 +157,79 @@
                 app:layout_constraintTop_toBottomOf="@+id/poster_of_movie_iv" />
 
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/review_rv"
-                android:layout_width="0dp"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp"
+                android:paddingBottom="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/movie_description_tv">
 
-            </android.support.v7.widget.RecyclerView>
+                <TextView
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/trailers"
+                    android:id="@+id/textViewTrailer"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                />
 
-        </android.support.constraint.ConstraintLayout>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/trailer_rv"
+                    android:layout_below="@id/textViewTrailer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    />
+
+                <TextView
+                    android:layout_below="@id/textViewTrailer"
+                    android:id="@+id/textViewNoTrailer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="20dp"
+                    android:gravity="center"
+                    android:text="@string/no_connection_trailers"/>
+
+                <TextView
+                    android:id="@+id/review_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/reviews"
+                    android:textSize="20sp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:layout_below="@id/trailer_rv"
+                    />
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/review_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@id/review_text"
+                    />
+                <TextView
+                    android:id="@+id/no_connection_reviews"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_connection_review"
+                    android:layout_below="@id/review_text"
+                   />
+            </RelativeLayout>
+
+
+
+</android.support.constraint.ConstraintLayout>
 
 
     </FrameLayout>
